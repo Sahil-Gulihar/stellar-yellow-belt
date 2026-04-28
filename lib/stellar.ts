@@ -18,7 +18,7 @@ export const TESTNET_DETAILS = {
   rpcUrl: "https://soroban-testnet.stellar.org",
 };
 
-export const CONTRACT_ID = "CBEOJUP5FU6KKOEZ7RMTSKZ7YLBS5D6LVATIGCESOGXSZEQ2UWQFKZW6";
+export const CONTRACT_ID = "CDLLV7BWI7S2FGKY6UOKBKQC4JWD5W5A4LDAOZDS3XMWWDJZENBGG7GA";
 
 // Function to initialize the kit only on client side
 export function initStellarKit() {

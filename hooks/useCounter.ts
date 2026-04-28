@@ -77,9 +77,9 @@ export function useCounter(address: string | null) {
         throw new Error('Simulation failed: ' + sim.error);
       }
 
-      const preparedTx = rpc.assembleTransaction(tx, sim);
+      const preparedTx = rpc.assembleTransaction(tx, sim).build();
       
-      const { signedTxXdr } = await StellarWalletsKit.signTransaction((preparedTx as any).toXDR());
+      const { signedTxXdr } = await StellarWalletsKit.signTransaction(preparedTx.toXDR());
       
       const submission = await server.sendTransaction(
         TransactionBuilder.fromXDR(signedTxXdr, TESTNET_DETAILS.networkPassphrase)

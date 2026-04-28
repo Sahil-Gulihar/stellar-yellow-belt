@@ -43,8 +43,8 @@ Building on White Belt skills, this project integrates multiple wallets, interac
 - **Meaningful commits**: Multiple commits detailing the development process.
 
 ### Screenshot Placeholder
-*(In a real submission, include a screenshot of the wallet selection modal here)*
+![alt text](image-1.png)
 
 ### Transaction Example
-- **Transaction Hash**: `[Example Hash]` (Use a real hash from your testnet call here)
-- **Stellar Explorer**: [View on Stellar.expert](https://stellar.expert/explorer/testnet/contract/CBEOJUP5FU6KKOEZ7RMTSKZ7YLBS5D6LVATIGCESOGXSZEQ2UWQFKZW6)
+- **Transaction Hash**: `[Example Hash]` CDLLV7BWI7S2FGKY6UOKBKQC4JWD5W5A4LDAOZDS3XMWWDJZENBGG7GA
+- **Stellar Explorer**: [View on Stellar.expert](https://stellar.expert/explorer/testnet/contract/CDLLV7BWI7S2FGKY6UOKBKQC4JWD5W5A4LDAOZDS3XMWWDJZENBGG7GA)

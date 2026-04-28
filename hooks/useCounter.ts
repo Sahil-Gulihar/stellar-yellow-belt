@@ -2,15 +2,15 @@ import { useState, useEffect, useCallback } from 'react';
 import { 
   server, 
   CONTRACT_ID, 
-  TESTNET_DETAILS, 
-  kit 
+  TESTNET_DETAILS 
 } from '@/lib/stellar';
+import { StellarWalletsKit } from '@creit.tech/stellar-wallets-kit';
 import { 
   TransactionBuilder, 
   Operation, 
   rpc, 
-  xdr,
-  scValToNative
+  scValToNative,
+  Account
 } from '@stellar/stellar-sdk';
 
 export function useCounter(address: string | null) {
@@ -21,16 +21,15 @@ export function useCounter(address: string | null) {
 
   const fetchCount = useCallback(async () => {
     try {
-      // Simulation is enough to get the current count
       const dummySource = "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF";
       const simResponse = await server.simulateTransaction(
         new TransactionBuilder(
-          new rpc.Account(dummySource, "0"),
+          new Account(dummySource, "0"),
           { fee: "100", networkPassphrase: TESTNET_DETAILS.networkPassphrase }
         )
         .addOperation(
           Operation.invokeContractFunction({
-            contractId: CONTRACT_ID,
+            contract: CONTRACT_ID,
             function: "get_count",
             args: []
           })
@@ -39,7 +38,7 @@ export function useCounter(address: string | null) {
         .build()
       );
 
-      if (rpc.Api.isSimulationSuccess(simResponse)) {
+      if (rpc.Api.isSimulationSuccess(simResponse) && simResponse.result) {
         const val = scValToNative(simResponse.result.retval);
         setCount(Number(val));
       }
@@ -59,13 +58,13 @@ export function useCounter(address: string | null) {
       const tx = new TransactionBuilder(
         account,
         { 
-          fee: "1000", // Standard fee
+          fee: "1000",
           networkPassphrase: TESTNET_DETAILS.networkPassphrase 
         }
       )
       .addOperation(
         Operation.invokeContractFunction({
-          contractId: CONTRACT_ID,
+          contract: CONTRACT_ID,
           function: "increment",
           args: []
         })
@@ -73,7 +72,6 @@ export function useCounter(address: string | null) {
       .setTimeout(30)
       .build();
 
-      // Simulate first to get footprints (required for Soroban)
       const sim = await server.simulateTransaction(tx);
       if (rpc.Api.isSimulationError(sim)) {
         throw new Error('Simulation failed: ' + sim.error);
@@ -81,35 +79,31 @@ export function useCounter(address: string | null) {
 
       const preparedTx = rpc.assembleTransaction(tx, sim);
       
-      // Sign with the kit
-      const { result: signedTxXdr } = await kit.signTransaction(preparedTx.toXDR());
+      const { signedTxXdr } = await StellarWalletsKit.signTransaction((preparedTx as any).toXDR());
       
-      // Submit
       const submission = await server.sendTransaction(
         TransactionBuilder.fromXDR(signedTxXdr, TESTNET_DETAILS.networkPassphrase)
       );
 
-      if (submission.status !== 'PENDING') {
+      if ((submission as any).status !== 'PENDING') {
         throw new Error('Transaction submission failed');
       }
 
-      // Poll for status
       let response = await server.getTransaction(submission.hash);
-      while (response.status === 'NOT_FOUND' || response.status === 'PENDING') {
+      while ((response as any).status === 'NOT_FOUND' || (response as any).status === 'PENDING') {
         await new Promise(resolve => setTimeout(resolve, 1000));
         response = await server.getTransaction(submission.hash);
       }
 
-      if (response.status === 'SUCCESS') {
+      if ((response as any).status === 'SUCCESS') {
         setTxStatus('success');
         fetchCount();
       } else {
-        throw new Error('Transaction failed: ' + response.status);
+        throw new Error('Transaction failed: ' + (response as any).status);
       }
     } catch (err: any) {
       console.error(err);
       setTxStatus('fail');
-      // Requirements: Error handling (3 types)
       if (err.message?.includes('InsufficientBalance')) {
         setError('Insufficient balance to pay for transaction.');
       } else {
@@ -118,9 +112,8 @@ export function useCounter(address: string | null) {
     }
   }, [address, fetchCount]);
 
-  // Real-time events listening
   useEffect(() => {
-    let interval = setInterval(fetchCount, 5000); // Poll every 5s for updates (simulating events)
+    let interval = setInterval(fetchCount, 5000);
     fetchCount();
     
     return () => clearInterval(interval);

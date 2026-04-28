@@ -1,6 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { kit, TESTNET_DETAILS } from '@/lib/stellar';
-import { SupportedWallet } from '@creit.tech/stellar-wallets-kit';
+import { useState, useCallback } from 'react';
+import { StellarWalletsKit } from '@creit.tech/stellar-wallets-kit';
 
 export function useWallet() {
   const [address, setAddress] = useState<string | null>(null);
@@ -11,25 +10,13 @@ export function useWallet() {
     setLoading(true);
     setError(null);
     try {
-      // Requirements: Multi-wallet integration
-      // kit.openModal() handles the selection UI
-      const { address } = await kit.openModal({
-        onClosed: (error) => {
-          if (error) setError('Wallet selection cancelled');
-        },
-        modalTitle: 'Connect your Stellar Wallet',
-        allowedWallets: [
-          SupportedWallet.FREIGHTER,
-          SupportedWallet.ALBEDO,
-          SupportedWallet.XBULL,
-          SupportedWallet.HANA,
-        ],
-      });
+      // New API uses authModal
+      await StellarWalletsKit.authModal({});
 
+      const { address } = await StellarWalletsKit.getAddress();
       setAddress(address);
     } catch (err: any) {
       console.error(err);
-      // Requirements: Error handling (3 types)
       if (err.message?.includes('not found')) {
         setError('Wallet extension not found. Please install it.');
       } else if (err.message?.includes('User rejected')) {
@@ -42,7 +29,8 @@ export function useWallet() {
     }
   }, []);
 
-  const disconnect = useCallback(() => {
+  const disconnect = useCallback(async () => {
+    await StellarWalletsKit.disconnect();
     setAddress(null);
     setError(null);
   }, []);

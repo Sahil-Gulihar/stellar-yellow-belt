@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Stellar Yellow Belt: Live Counter App
 
-## Getting Started
+Building on White Belt skills, this project integrates multiple wallets, interacts with a Soroban smart contract on Testnet, and implements real-time data synchronization.
 
-First, run the development server:
+## 🚀 Features
+- **Multi-wallet integration**: Supports Freighter, Albedo, xBull, and Hana using `StellarWalletsKit`.
+- **Smart Contract Integration**: Reads from and writes to a Counter contract on Stellar Testnet.
+- **Real-time Synchronization**: Automatically polls the contract state to keep the UI in sync.
+- **Transaction Tracking**: Visual feedback for 'Pending', 'Success', and 'Fail' states.
+- **Robust Error Handling**: Handles wallet not found, user rejection, and insufficient balance.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🛠 Setup Instructions
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+2. **Run the development server**:
+   ```bash
+   npm run dev
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. **Open the app**:
+   Navigate to [http://localhost:3000](http://localhost:3000).
 
-## Learn More
+## 📝 Project Details
 
-To learn more about Next.js, take a look at the following resources:
+- **Contract ID**: `CBEOJUP5FU6KKOEZ7RMTSKZ7YLBS5D6LVATIGCESOGXSZEQ2UWQFKZW6` (Standard Soroban Example)
+- **Network**: Stellar Testnet
+- **Wallet Options**: The app uses `StellarWalletsKit`'s built-in modal to provide options for all supported Stellar wallets.
+- **Error Handling**:
+  - `Wallet extension not found`: Prompted when the selected wallet is not installed.
+  - `User rejected`: Handled when the user cancels the connection or transaction.
+  - `Insufficient balance`: Caught during simulation or submission if the account lacks XLM for fees.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## ✅ Submission Checklist Requirements
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **3 error types handled**: Handled in `hooks/useWallet.ts` and `hooks/useCounter.ts`.
+- **Contract deployed on testnet**: Uses the official Soroban Counter example.
+- **Contract called from frontend**: Implemented in `hooks/useCounter.ts` using `stellar-sdk`.
+- **Transaction status visible**: Implemented in the main UI with color-coded status indicators.
+- **Meaningful commits**: Multiple commits detailing the development process.
 
-## Deploy on Vercel
+### Screenshot Placeholder
+*(In a real submission, include a screenshot of the wallet selection modal here)*
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Transaction Example
+- **Transaction Hash**: `[Example Hash]` (Use a real hash from your testnet call here)
+- **Stellar Explorer**: [View on Stellar.expert](https://stellar.expert/explorer/testnet/contract/CBEOJUP5FU6KKOEZ7RMTSKZ7YLBS5D6LVATIGCESOGXSZEQ2UWQFKZW6)

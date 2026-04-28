@@ -1,64 +1,131 @@
-import Image from "next/image";
+"use client";
+
+import { useWallet } from "@/hooks/useWallet";
+import { useCounter } from "@/hooks/useCounter";
+import { CONTRACT_ID } from "@/lib/stellar";
 
 export default function Home() {
+  const { address, error: walletError, loading: walletLoading, connect, disconnect } = useWallet();
+  const { count, increment, txStatus, error: txError, loading: txLoading } = useCounter(address);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="min-h-screen bg-neutral-950 text-neutral-100 p-8 font-sans">
+      <main className="max-w-2xl mx-auto space-y-12">
+        {/* Header */}
+        <section className="space-y-4">
+          <h1 className="text-4xl font-bold tracking-tight text-white bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
+            Soroban Live Counter
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-neutral-400 text-lg">
+            Yellow Belt Level: Multi-wallet integration, real-time events, and contract interaction.
           </p>
+        </section>
+
+        {/* Wallet Connection */}
+        <div className="p-6 rounded-2xl bg-neutral-900 border border-neutral-800 shadow-xl space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold">Wallet</h2>
+            {address ? (
+              <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-xs font-medium uppercase tracking-wider">
+                Connected
+              </span>
+            ) : (
+              <span className="px-3 py-1 bg-neutral-800 text-neutral-400 rounded-full text-xs font-medium uppercase tracking-wider">
+                Disconnected
+              </span>
+            )}
+          </div>
+
+          {!address ? (
+            <button
+              onClick={connect}
+              disabled={walletLoading}
+              className="w-full py-3 bg-white text-black font-bold rounded-xl hover:bg-neutral-200 transition-colors disabled:opacity-50"
+            >
+              {walletLoading ? "Connecting..." : "Connect Wallet"}
+            </button>
+          ) : (
+            <div className="space-y-4">
+              <div className="p-3 bg-neutral-950 rounded-lg border border-neutral-800 break-all font-mono text-sm text-neutral-400">
+                {address}
+              </div>
+              <button
+                onClick={disconnect}
+                className="w-full py-2 bg-neutral-800 text-neutral-300 font-medium rounded-xl hover:bg-neutral-700 transition-colors"
+              >
+                Disconnect
+              </button>
+            </div>
+          )}
+
+          {walletError && (
+            <p className="text-red-400 text-sm bg-red-400/10 p-3 rounded-lg border border-red-400/20">
+              Error: {walletError}
+            </p>
+          )}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Contract Interaction */}
+        <div className="p-6 rounded-2xl bg-neutral-900 border border-neutral-800 shadow-xl space-y-8">
+          <div className="space-y-2">
+            <h2 className="text-xl font-semibold">Contract Stats</h2>
+            <p className="text-xs text-neutral-500 font-mono truncate">
+              ID: {CONTRACT_ID}
+            </p>
+          </div>
+
+          <div className="flex flex-col items-center justify-center py-12 bg-neutral-950 rounded-2xl border border-neutral-800 shadow-inner">
+            <span className="text-neutral-500 text-sm uppercase tracking-widest mb-2 font-medium">Current Count</span>
+            <span className="text-7xl font-black text-white">
+              {count !== null ? count : "--"}
+            </span>
+          </div>
+
+          <div className="space-y-4">
+            <button
+              onClick={increment}
+              disabled={!address || txLoading}
+              className={`w-full py-4 rounded-xl font-bold text-lg transition-all transform active:scale-[0.98] ${
+                !address 
+                  ? "bg-neutral-800 text-neutral-600 cursor-not-allowed" 
+                  : "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-900/20 hover:from-blue-500 hover:to-blue-400"
+              }`}
+            >
+              {txLoading ? "Transaction Pending..." : "Increment Counter"}
+            </button>
+
+            {/* Transaction Status UI */}
+            <div className="flex justify-between items-center px-2">
+              <div className="flex items-center space-x-2">
+                <div className={`w-2 h-2 rounded-full ${
+                  txStatus === 'pending' ? 'bg-yellow-500 animate-pulse' : 
+                  txStatus === 'success' ? 'bg-emerald-500' : 
+                  txStatus === 'fail' ? 'bg-red-500' : 'bg-neutral-700'
+                }`} />
+                <span className="text-sm text-neutral-400 capitalize">
+                  Status: {txStatus}
+                </span>
+              </div>
+              
+              {txStatus === 'success' && (
+                <span className="text-xs text-emerald-400 font-medium animate-in fade-in slide-in-from-right-4">
+                  Count Updated!
+                </span>
+              )}
+            </div>
+
+            {txError && (
+              <p className="text-red-400 text-sm bg-red-400/10 p-3 rounded-lg border border-red-400/20">
+                {txError}
+              </p>
+            )}
+          </div>
         </div>
+
+        {/* Footer */}
+        <footer className="text-center text-neutral-600 text-sm pb-12">
+          <p>Built for Stellar Yellow Belt • Testnet</p>
+        </footer>
       </main>
     </div>
   );

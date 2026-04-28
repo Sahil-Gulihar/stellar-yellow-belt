@@ -46,5 +46,5 @@ Building on White Belt skills, this project integrates multiple wallets, interac
 ![alt text](image-1.png)
 
 ### Transaction Example
-- **Transaction Hash**: `[Example Hash]` CDLLV7BWI7S2FGKY6UOKBKQC4JWD5W5A4LDAOZDS3XMWWDJZENBGG7GA
+- **Transaction Hash**: CDLLV7BWI7S2FGKY6UOKBKQC4JWD5W5A4LDAOZDS3XMWWDJZENBGG7GA
 - **Stellar Explorer**: [View on Stellar.expert](https://stellar.expert/explorer/testnet/contract/CDLLV7BWI7S2FGKY6UOKBKQC4JWD5W5A4LDAOZDS3XMWWDJZENBGG7GA)
